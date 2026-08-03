@@ -194,6 +194,10 @@
 
   /* ---------- Mobil ---------- */
   @media (max-width:720px){
+    /* trängre nav: visa bara WHND och dra ihop typografin */
+    nav{font-size:12px;letter-spacing:.05em;padding:16px 20px}
+    nav .links{gap:18px}
+    .brand-rest{display:none}
     .wordmark{font-size:26vw}
     .wordmark-sub{font-size:10px;letter-spacing:.16em;max-width:90vw;white-space:normal}
     .holding article{grid-template-columns:1fr;gap:8px}
@@ -205,7 +209,7 @@
 <body>
 
 <nav>
-  <a href="#top">WHND Holding AB</a>
+  <a href="#top">WHND<span class="brand-rest"> Holding AB</span></a>
   <div class="links">
     <a href="#engagements">Engagements</a>
     <a href="#contact">Contact</a>
