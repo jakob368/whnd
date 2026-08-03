@@ -45,7 +45,9 @@
     position:fixed;top:0;left:0;right:0;z-index:20;
     display:flex;justify-content:space-between;align-items:center;
     padding:20px clamp(20px,4vw,48px);
-    mix-blend-mode:multiply; /* navigationen smälter också in i bilden */
+    /* skiftar mörk → vit medan blå lagret tonas in, och tillbaka till mörk
+       när man lämnar heron (--np sätts i JS) */
+    color:color-mix(in srgb, var(--ink) calc((1 - var(--np,0)) * 100%), #fff calc(var(--np,0) * 100%));
     font-size:14px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
   }
   nav .links{display:flex;gap:28px}
@@ -68,18 +70,22 @@
     position:absolute;inset:0;
     width:100%;height:100%;
     object-fit:cover;
-    filter:blur(calc(var(--p,0) * 16px)) brightness(calc(1 + var(--p,0) * .07));
-    transform:scale(calc(1.02 + var(--p,0) * .08)); /* döljer blur-kanterna + subtil zoom */
+    filter:brightness(calc(1 + var(--p,0) * .75)); /* exponeringen ökar under scrollen */
+    transform:scale(calc(1.02 + var(--p,0) * .06)); /* subtil zoom under scrollen */
     will-change:filter,transform;
   }
+  /* Inverterat upplägg: blått lager med VIT text, hela lagret i multiply.
+     Multiply-matten gör jobbet: vitt × bild = bilden syns orörd (bokstäverna
+     blir utstansade fönster), blått × bild = blåtonad bild. --p styr hur
+     mycket av lagret som tonats in. */
   .wordmark-group{
     position:absolute;inset:0;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:clamp(14px,2.5svh,28px);
-    color:var(--blue);
-    mix-blend-mode:multiply;                  /* multipliceras mot bilden */
-    opacity:calc(.07 + var(--p,0) * .93);     /* knappt synligt → fullt framme */
-    transform:scale(calc(1.08 - var(--p,0) * .08));
+    background:var(--blue);
+    color:#fff;
+    mix-blend-mode:multiply;
+    opacity:var(--p,0);                       /* osynligt → fullt intonat */
     user-select:none;
     z-index:2;
   }
@@ -147,7 +153,9 @@
   .holding{display:grid;gap:0}
   .holding article{
     display:grid;
-    grid-template-columns:80px 1fr 2fr;
+    /* procentkolumn i stället för fr: annars breddar långa bolagsnamn
+       (Enkelbouppteckning.se) sin kolumn och raderna linjerar inte */
+    grid-template-columns:80px minmax(0,40%) minmax(0,1fr);
     gap:clamp(16px,3vw,48px);
     padding:40px 0;
     border-top:1px solid var(--line);
@@ -158,6 +166,7 @@
   .holding h3{
     font-size:clamp(22px,2.6vw,32px);
     font-weight:800;letter-spacing:-.02em;line-height:1.15;
+    overflow-wrap:anywhere; /* säkerhet: långa namn bryts hellre än sväller ut */
   }
   .holding h3 a:hover{color:var(--blue)}
   .holding h3 .arrow{font-weight:400;font-size:.7em;vertical-align:.2em;margin-left:.3em;color:var(--blue)}
@@ -181,12 +190,12 @@
 
   /* ---------- Footer ---------- */
   footer{
-    border-top:1px solid var(--line);
-    padding:32px 0 40px;
+    background:var(--blue);            /* samma blå som heron vid full scroll */
+    padding:56px 0 64px;
     display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
-    font-size:13px;color:var(--muted);
+    font-size:13px;color:rgba(255,255,255,.72);
   }
-  footer .mark{font-weight:900;letter-spacing:-.03em;color:var(--blue)}
+  footer .mark{font-weight:900;letter-spacing:-.03em;color:#fff}
 
   /* ---------- Reveal on scroll ---------- */
   .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
@@ -319,15 +328,23 @@
     // innan sektionen släpper.
     const range = (heroScroll.offsetHeight - innerHeight) * 0.8;
     const p = Math.min(1, Math.max(0, scrollY / range));
-    document.documentElement.style.setProperty('--p', p.toFixed(4));
+    if (!reduceMotion){
+      document.documentElement.style.setProperty('--p', p.toFixed(4));
+    }
+
+    // Navfärgen: följer p inne i heron, tonar tillbaka till mörk när
+    // sticky-läget släpper och de ljusa sektionerna tar över. Körs även
+    // vid reduced motion (då är heron statiskt blå, --p = 1).
+    const pEff = reduceMotion ? 1 : p;
+    const released = scrollY - (heroScroll.offsetHeight - innerHeight);
+    const np = released > 0 ? Math.max(0, 1 - released / (innerHeight * 0.3)) : pEff;
+    document.documentElement.style.setProperty('--np', np.toFixed(4));
   }
-  if (!reduceMotion){
-    addEventListener('scroll', () => {
-      if (!ticking){ ticking = true; requestAnimationFrame(updateHero); }
-    }, { passive:true });
-    addEventListener('resize', updateHero);
-    updateHero();
-  }
+  addEventListener('scroll', () => {
+    if (!ticking){ ticking = true; requestAnimationFrame(updateHero); }
+  }, { passive:true });
+  addEventListener('resize', updateHero);
+  updateHero();
 </script>
 
 </body>
