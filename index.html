@@ -107,6 +107,21 @@
     text-transform:uppercase;
     text-align:center;
   }
+  /* Sublinen i solid vitt: en identisk kopia av gruppen ligger ovanpå
+     multiply-lagret (normal blending). WHND är osynligt där och reserverar
+     bara exakt samma plats, så den vita sublinen hamnar pixelperfekt. */
+  .wordmark-overlay{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:clamp(14px,2.5svh,28px);
+    opacity:var(--p,0);
+    user-select:none;
+    pointer-events:none;
+    z-index:3;
+  }
+  .wordmark-overlay .wordmark{visibility:hidden}
+  .wordmark-overlay .wordmark-sub{color:#fff}
+  .wordmark-group .wordmark-sub{visibility:hidden} /* originalet reserverar bara plats */
   /* SCROLL-nudge: mitten-mitten, syns direkt, tonar bort när WHND framträder */
   .scroll-nudge{
     position:absolute;
@@ -152,6 +167,66 @@
     max-width:20em;
   }
   .intro p + p{margin-top:1em;font-size:clamp(17px,1.6vw,20px);font-weight:400;color:var(--muted);max-width:36em}
+
+  /* ---------- Tooltips med överstrykningspenna ---------- */
+  .tip{
+    position:relative;
+    cursor:help;
+    outline:none;
+    text-decoration:underline dotted rgba(25,24,23,.55);
+    text-decoration-thickness:1.5px;
+    text-underline-offset:4px;
+    /* markeringspennan: gul, lätt ojämn i kanterna */
+    background:linear-gradient(100deg,
+      rgba(255,224,80,0) 1%,
+      rgba(255,224,80,.55) 4%,
+      rgba(255,224,80,.48) 96%,
+      rgba(255,224,80,0) 99%);
+    padding:.1em .25em;
+    margin:-.1em -.05em;
+    border-radius:.3em .5em .4em .35em;
+    box-decoration-break:clone;
+    -webkit-box-decoration-break:clone;
+  }
+  .tip::after{
+    content:attr(data-tip);
+    position:absolute;
+    bottom:calc(100% + 12px);
+    left:50%;
+    transform:translateX(-50%) translateY(4px);
+    width:max-content;
+    max-width:min(300px,72vw);
+    background:var(--ink);
+    color:#fff;
+    font-size:13.5px;
+    font-weight:400;
+    letter-spacing:0;
+    line-height:1.55;
+    padding:10px 14px;
+    border-radius:8px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease,transform .2s ease;
+    z-index:10;
+  }
+  .tip::before{ /* pilen */
+    content:"";
+    position:absolute;
+    bottom:calc(100% + 5px);
+    left:50%;
+    transform:translateX(-50%);
+    border:7px solid transparent;
+    border-top-color:var(--ink);
+    opacity:0;
+    transition:opacity .2s ease;
+    z-index:10;
+  }
+  .tip:hover::after,.tip:focus::after,
+  .tip:hover::before,.tip:focus::before{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+  .tip:hover::before,.tip:focus::before{transform:translateX(-50%)}
 
   /* ---------- Bolag ---------- */
   .holding{display:grid;gap:0}
@@ -236,6 +311,10 @@
       <h1 class="wordmark" aria-label="WHND">WHND</h1>
       <p class="wordmark-sub">WHND Holding AB &ndash; Jakob and Christina Rydberg</p>
     </div>
+    <div class="wordmark-overlay" aria-hidden="true">
+      <span class="wordmark">WHND</span>
+      <p class="wordmark-sub">WHND Holding AB &ndash; Jakob and Christina Rydberg</p>
+    </div>
     <div class="scroll-nudge" aria-hidden="true">
       <span class="label">Scroll</span>
       <span class="circle">
@@ -250,8 +329,8 @@
 <section class="intro">
   <div class="wrap reveal">
     <p class="kicker">About</p>
-    <p>WHND Holding AB is owned by Christina and Jakob, with backgrounds in law and project management in the creative industries.</p>
-    <p>Through Contentbyrån AB (Rydberg Ekblom Group) we are engaged in a wide range of industries. What matters to us is long-term commitment, hands-on ownership and working with people we genuinely like.</p><!-- TODO-TEXT: "What matters to us..." är mitt förslag – justera gärna -->
+    <p><span class="tip" tabindex="0" data-tip="Yes, the letters stand for something. No, we&rsquo;re not telling. Some things stay in the family.">WHND Holding AB</span> is owned by Christina and Jakob, with backgrounds in law and project management in the creative industries.</p>
+    <p>Through Contentbyrån AB (Rydberg Ekblom Group) we are engaged in <span class="tip" tabindex="0" data-tip="The tastiest one by far: Bygden Restauranger.">a wide range of industries</span>. What matters to us is long-term commitment, hands-on ownership and working with people we genuinely like.</p><!-- TODO-TEXT: "What matters to us..." är mitt förslag – justera gärna -->
   </div>
 </section>
 
