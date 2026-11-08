@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WHND Holding AB</title>
 <meta name="description" content="WHND Holding AB – family-owned holding company of Jakob and Christina Rydberg. Engagements include Rydberg Ekblom Group and enkelbouppteckning.se.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://whnd.se/">
+<meta property="og:title" content="WHND Holding AB">
+<meta property="og:description" content="Family-owned holding company of Jakob and Christina Rydberg.">
+<meta property="og:image" content="https://whnd.se/og.jpg">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1260">
+<meta name="twitter:card" content="summary_large_image">
 
 <!-- ============================================================
      WHND Holding AB — whnd.se
@@ -72,6 +81,14 @@
     cursor:crosshair;
   }
   canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  /* ---------- Dygnsrytm: nattläge (00–05) inverterar heron ---------- */
+  body.t-night header{background:#070c22}
+  body.t-night header::after{
+    background:linear-gradient(to bottom, rgba(244,241,236,0), var(--paper));
+  }
+  body.t-night .wordmark-group{mix-blend-mode:screen;color:#5f7dff}
+  body.t-night .scroll-nudge{color:#8fa3ff}
+  body.t-night .scroll-nudge .circle{border-color:#8fa3ff}
   /* mjuk kant i botten: bläcket löses upp i papperet */
   header::after{
     content:"";
@@ -201,7 +218,26 @@
   .tip:hover::before,.tip:focus::before{opacity:1}
 
   /* ---------- Engagements: liten länklista med hierarki ---------- */
+  #engagements{position:relative}
+  /* mjuk färg-wash bakom listan: tonas till bolagets färg vid hover */
+  #engagements::before{
+    content:"";
+    position:absolute;left:-8%;top:8%;
+    width:70%;height:84%;
+    background-color:transparent;
+    opacity:0;
+    filter:blur(90px);
+    border-radius:50%;
+    transition:background-color .6s ease,opacity .6s ease;
+    pointer-events:none;
+  }
+  #engagements.washed::before{
+    background-color:var(--washc,var(--blue));
+    opacity:.12;
+  }
+  .companies{position:relative}
   .companies a.row{
+    --c:var(--blue);
     display:flex;justify-content:space-between;align-items:baseline;gap:16px;
     padding:24px 0;
     border-top:1px solid var(--line);
@@ -216,8 +252,8 @@
     white-space:nowrap;
     transition:color .2s ease;
   }
-  .companies a.row:hover{color:var(--blue)}
-  .companies a.row:hover .dom{color:var(--blue)}
+  .companies a.row:hover{color:var(--c)}
+  .companies a.row:hover .dom{color:var(--c)}
   .companies .name{display:flex;flex-direction:column;gap:3px;transition:transform .25s ease}
   .companies a.row:hover .name{transform:translateX(10px)}
   /* barn till Rydberg Ekblom Group: indrag + mindre grad */
@@ -264,6 +300,28 @@
     .wordmark-sub{font-size:10px;letter-spacing:.16em;max-width:90vw;white-space:normal}
     .act .ghost{font-size:90vw;opacity:.045}
   }
+  /* ---------- Print: brevpapper i stället för skärmdump ---------- */
+  @media print{
+    nav,canvas,.scroll-nudge,.wordmark-overlay{display:none!important}
+    .reveal{opacity:1!important;transform:none!important;transition:none!important}
+    body{background:#fff}
+    .hero-scroll{height:auto}
+    header{position:static;height:auto;background:none;padding:40pt 0 0;overflow:visible;cursor:auto}
+    header::after{display:none}
+    .wordmark-group{position:static;mix-blend-mode:normal;color:var(--blue);gap:10pt}
+    .wordmark{font-size:64pt}
+    .wordmark span{animation:none!important;opacity:1!important;filter:none!important;transform:none!important}
+    .wordmark-sub{animation:none!important;opacity:1!important;font-size:9pt}
+    section{padding:22pt 0;break-inside:avoid}
+    .tip{background:none;text-decoration:none;padding:0;margin:0}
+    .tip::after,.tip::before{display:none}
+    #engagements::before{display:none}
+    .companies a.row{padding:8pt 0;font-size:14pt}
+    .companies a.row.sub{padding:6pt 0 6pt 24pt;font-size:11pt}
+    .companies .dom{font-size:9pt}
+    footer{background:none;color:var(--muted);padding:20pt 0;text-align:left}
+    footer .mark{color:var(--blue);text-shadow:none;font-size:18pt;margin-bottom:6pt}
+  }
 </style>
 </head>
 <body>
@@ -307,27 +365,27 @@
 <section id="engagements">
   <div class="wrap reveal companies">
     <p class="kicker">Engagements</p>
-    <a class="row" href="https://rydbergekblom.se" target="_blank" rel="noopener">
+    <a class="row" href="https://rydbergekblom.se" target="_blank" rel="noopener" style="--c:#002fa7">
       <span class="name">Rydberg Ekblom Group</span>
       <span class="dom">rydbergekblom.se &nearr;</span>
     </a>
-    <a class="row sub" href="https://validwell.com" target="_blank" rel="noopener">
+    <a class="row sub" href="https://validwell.com" target="_blank" rel="noopener" style="--c:#0d5c4a">
       <span class="name">Validwell</span>
       <span class="dom">validwell.com &nearr;</span>
     </a>
-    <a class="row sub" href="https://www.electric.se/films" target="_blank" rel="noopener">
+    <a class="row sub" href="https://www.electric.se/films" target="_blank" rel="noopener" style="--c:#6b2fd6">
       <span class="name">Electric Films</span>
       <span class="dom">electric.se/films &nearr;</span>
     </a>
-    <a class="row sub" href="https://www.electric.se/boardsbikes" target="_blank" rel="noopener">
+    <a class="row sub" href="https://www.electric.se/boardsbikes" target="_blank" rel="noopener" style="--c:#e8590c">
       <span class="name">Electric Boards and Bikes</span>
       <span class="dom">electric.se/boardsbikes &nearr;</span>
     </a>
-    <a class="row sub" href="https://bgdn.se" target="_blank" rel="noopener">
+    <a class="row sub" href="https://bgdn.se" target="_blank" rel="noopener" style="--c:#b4542e">
       <span class="name">Bygden</span>
       <span class="dom">bgdn.se &nearr;</span>
     </a>
-    <a class="row" href="https://enkelbouppteckning.se" target="_blank" rel="noopener">
+    <a class="row" href="https://enkelbouppteckning.se" target="_blank" rel="noopener" style="--c:#1a7a8a">
       <span class="name">Enkelbouppteckning</span>
       <span class="dom">enkelbouppteckning.se &nearr;</span>
     </a>
@@ -383,6 +441,8 @@
       precision highp float;
       uniform vec2 u_res;uniform float u_t;uniform vec2 u_mouse;
       uniform float u_mi;uniform float u_amt;uniform float u_pull;
+      uniform float u_night;      /* 0 = dag, 1 = inverterat nattläge */
+      uniform vec3 u_drops[6];    /* klickdroppar: x,y (uv) + ålder i sek (-1 = inaktiv) */
       float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
       float noise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);
         return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);}
@@ -400,9 +460,19 @@
         vec2 r=vec2(fbm(p+2.6*q+drag+vec2(1.7,9.2)+t*.55),fbm(p+2.6*q-drag+vec2(8.3,2.8)-t*.35));
         float f=fbm(p+3.2*r+drag*1.4);
         f+=pull*.22;
-        vec3 paper=vec3(.957,.945,.925);
-        vec3 blue=vec3(0.,.184,.655);
-        vec3 deep=vec3(0.,.075,.33);
+        /* klickdroppar: expanderande ringar som rör om i bläcket */
+        for(int i=0;i<6;i++){
+          vec3 d=u_drops[i];
+          if(d.z>=0.0){
+            vec2 dp=(d.xy-.5)*vec2(aspect,1.)*1.9;
+            float dist=length(p-dp);
+            float ring=exp(-pow((dist-d.z*.45)*5.5,2.0));
+            f+=ring*exp(-d.z*.85)*.45;
+          }
+        }
+        vec3 paper=mix(vec3(.957,.945,.925), vec3(.027,.047,.133), u_night);
+        vec3 blue =mix(vec3(0.,.184,.655),  vec3(.33,.45,1.),     u_night);
+        vec3 deep =mix(vec3(0.,.075,.33),   vec3(.82,.88,1.),     u_night);
         float ink1=smoothstep(.38-u_amt,.80-u_amt,f);
         float ink2=smoothstep(.68-u_amt,.98-u_amt,f);
         vec3 col=mix(paper,blue,ink1);
@@ -424,7 +494,8 @@
     const loc=gl.getAttribLocation(prog,'a');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    const U={};['u_res','u_t','u_mouse','u_mi','u_amt','u_pull'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
+    const U={};['u_res','u_t','u_mouse','u_mi','u_amt','u_pull','u_night'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
+    U.u_drops=gl.getUniformLocation(prog,'u_drops[0]');
     function resize(){
       const dpr=Math.min(window.devicePixelRatio||1,1.5);
       canvas.width=canvas.clientWidth*dpr;canvas.height=canvas.clientHeight*dpr;
@@ -436,18 +507,46 @@
     addEventListener('pointermove',e=>{tx=e.clientX/innerWidth;ty=1-e.clientY/innerHeight;ti=1;});
     addEventListener('pointerleave',()=>{ti=0;});
 
+    /* ---------- Dygnsrytm ----------
+       morgon 05–11: glesare bläck · dag 11–17: standard
+       kväll 17–23: tätare · natt 23–05: inverterat
+       Förhandsgranska med ?mode=night (morning/day/evening/night) */
+    const forced=new URLSearchParams(location.search).get('mode');
+    const h=new Date().getHours();
+    const mode=['morning','day','evening','night'].includes(forced)?forced:
+      (h>=23||h<5)?'night':h<11?'morning':h<17?'day':'evening';
+    document.body.classList.add('t-'+mode);
+    const NIGHT=mode==='night'?1:0;
+    const AMT_OFFSET={morning:-0.03,day:0,evening:0.045,night:0.02}[mode];
+
+    /* ---------- Klickdroppar ---------- */
+    const drops=Array.from({length:6},()=>({x:0,y:0,t:-1}));
+    let dropIdx=0;
+    document.querySelector('header').addEventListener('pointerdown',e=>{
+      drops[dropIdx]={x:e.clientX/innerWidth,y:1-e.clientY/innerHeight,t:performance.now()};
+      dropIdx=(dropIdx+1)%6;
+    });
+    const dropArr=new Float32Array(18);
+
     const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
     let simT=0,last=performance.now();
     function frame(now){
       simT+=(now-last)/1000*LOCK.speed;last=now;
       mx+=(tx-mx)*.035;my+=(ty-my)*.035;mi+=(ti-mi)*.04;
-      const p=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--p'))||0;
+      for(let i=0;i<6;i++){
+        const d=drops[i];
+        const age=d.t<0?-1:(now-d.t)/1000;
+        dropArr[i*3]=d.x;dropArr[i*3+1]=d.y;
+        dropArr[i*3+2]=(age>4)?-1:age; /* droppen klingar av efter ~4 s */
+      }
       gl.uniform2f(U.u_res,canvas.width,canvas.height);
       gl.uniform1f(U.u_t,reduceMotion?12.0:simT);
       gl.uniform2f(U.u_mouse,mx,my);
       gl.uniform1f(U.u_mi,mi);
-      gl.uniform1f(U.u_amt,LOCK.amt);
+      gl.uniform1f(U.u_amt,LOCK.amt+AMT_OFFSET);
       gl.uniform1f(U.u_pull,LOCK.pull);
+      gl.uniform1f(U.u_night,NIGHT);
+      gl.uniform3fv(U.u_drops,dropArr);
       gl.drawArrays(gl.TRIANGLES,0,3);
       if(!reduceMotion)requestAnimationFrame(frame);
     }
@@ -476,6 +575,26 @@
     es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});
   },{threshold:0.25});
   document.querySelectorAll('.reveal,.act').forEach(el=>io.observe(el));
+
+  /* ---------- Färg-wash bakom listan vid hover ---------- */
+  const eng=document.getElementById('engagements');
+  document.querySelectorAll('.companies a.row').forEach(row=>{
+    row.addEventListener('mouseenter',()=>{
+      eng.style.setProperty('--washc',getComputedStyle(row).getPropertyValue('--c'));
+      eng.classList.add('washed');
+    });
+    row.addEventListener('mouseleave',()=>eng.classList.remove('washed'));
+  });
+
+  /* ---------- Signatur i konsolen ---------- */
+  console.log(
+    '%cWHND',
+    'font:900 64px Archivo,system-ui,sans-serif;color:#002fa7;letter-spacing:-3px'
+  );
+  console.log(
+    '%cYes, this site is hand-coded. The ink is generated in a WebGL shader — no images, no video, no frameworks. The whole page weighs less than one Instagram photo.\n\nStill wondering what WHND stands for? So is everyone. Some things stay in the family.\n\n→ jakob@rydbergekblom.se',
+    'color:#6f6a62;font-size:12px;line-height:1.6'
+  );
 })();
 </script>
 
