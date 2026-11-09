@@ -78,7 +78,6 @@
     height:100svh;
     overflow:hidden;
     background:var(--paper);
-    cursor:crosshair;
   }
   canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   /* ---------- Dygnsrytm: nattläge (00–05) inverterar heron ---------- */
@@ -441,7 +440,7 @@
       precision highp float;
       uniform vec2 u_res;uniform float u_t;uniform vec2 u_mouse;
       uniform float u_mi;uniform float u_amt;uniform float u_pull;
-      uniform float u_night;      /* 0 = dag, 1 = inverterat nattläge */
+      uniform vec3 u_cPaper;uniform vec3 u_cInk;uniform vec3 u_cDeep; /* palett per dygnsläge */
       uniform vec3 u_drops[6];    /* klickdroppar: x,y (uv) + ålder i sek (-1 = inaktiv) */
       float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
       float noise(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);
@@ -470,9 +469,9 @@
             f+=ring*exp(-d.z*.85)*.45;
           }
         }
-        vec3 paper=mix(vec3(.957,.945,.925), vec3(.027,.047,.133), u_night);
-        vec3 blue =mix(vec3(0.,.184,.655),  vec3(.33,.45,1.),     u_night);
-        vec3 deep =mix(vec3(0.,.075,.33),   vec3(.82,.88,1.),     u_night);
+        vec3 paper=u_cPaper;
+        vec3 blue =u_cInk;
+        vec3 deep =u_cDeep;
         float ink1=smoothstep(.38-u_amt,.80-u_amt,f);
         float ink2=smoothstep(.68-u_amt,.98-u_amt,f);
         vec3 col=mix(paper,blue,ink1);
@@ -494,7 +493,7 @@
     const loc=gl.getAttribLocation(prog,'a');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    const U={};['u_res','u_t','u_mouse','u_mi','u_amt','u_pull','u_night'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
+    const U={};['u_res','u_t','u_mouse','u_mi','u_amt','u_pull','u_cPaper','u_cInk','u_cDeep'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
     U.u_drops=gl.getUniformLocation(prog,'u_drops[0]');
     function resize(){
       const dpr=Math.min(window.devicePixelRatio||1,1.5);
@@ -516,8 +515,14 @@
     const mode=['morning','day','evening','night'].includes(forced)?forced:
       (h>=23||h<5)?'night':h<11?'morning':h<17?'day':'evening';
     document.body.classList.add('t-'+mode);
-    const NIGHT=mode==='night'?1:0;
     const AMT_OFFSET={morning:-0.03,day:0,evening:0.045,night:0.02}[mode];
+    /* ett dygn i färg: guldig gryning → blå dag → rosalila skymning → lysande natt */
+    const PAL={
+      morning:{paper:[.965,.945,.902], ink:[.878,.604,.161], deep:[.604,.357,.055]},
+      day:    {paper:[.957,.945,.925], ink:[0,.184,.655],    deep:[0,.075,.33]},
+      evening:{paper:[.960,.936,.930], ink:[.545,.282,.835], deep:[.220,.060,.380]},
+      night:  {paper:[.027,.047,.133], ink:[.33,.45,1],      deep:[.82,.88,1]}
+    }[mode];
 
     /* ---------- Klickdroppar ---------- */
     const drops=Array.from({length:6},()=>({x:0,y:0,t:-1}));
@@ -545,7 +550,9 @@
       gl.uniform1f(U.u_mi,mi);
       gl.uniform1f(U.u_amt,LOCK.amt+AMT_OFFSET);
       gl.uniform1f(U.u_pull,LOCK.pull);
-      gl.uniform1f(U.u_night,NIGHT);
+      gl.uniform3f(U.u_cPaper,PAL.paper[0],PAL.paper[1],PAL.paper[2]);
+      gl.uniform3f(U.u_cInk,PAL.ink[0],PAL.ink[1],PAL.ink[2]);
+      gl.uniform3f(U.u_cDeep,PAL.deep[0],PAL.deep[1],PAL.deep[2]);
       gl.uniform3fv(U.u_drops,dropArr);
       gl.drawArrays(gl.TRIANGLES,0,3);
       if(!reduceMotion)requestAnimationFrame(frame);
